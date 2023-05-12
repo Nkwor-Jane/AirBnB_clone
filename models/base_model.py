@@ -11,9 +11,9 @@ class BaseModel:
     """
         Defines all common attributes for other classes
     """
-    id = str(uuid4())
-    created_at = datetime.now()
-    updated_at = datetime.now()
+    id
+    created_at
+    updated_at
 
     def __init__(self, *args, **kwargs):
         """
@@ -23,14 +23,16 @@ class BaseModel:
         if kwargs is not None:
             for k, v in kwargs.items():
                 if k == "created_at" or k == "updated_at":
-                    time = datetime.strptime(v, "%Y-%m-%dT%H:%M:%S.%f")
-                    setattr(self, k, time)
-                elif k != "__class__":
-                    setattr(self, k, v)
-#        else:
-#            self.id = str(uuid4())
-#           self.created_at = datetime.now()
-#           self.updated_at = datetime.now()
+                    self.__dict__[k] = datetime\
+                                        .strptime(v, "%Y-%m-%dT%H:%M:%S.%f")
+#                    setattr(self, k, time)
+                elif k == "id":
+#                    setattr(self, k, v)
+                     self.id = v
+        else:
+            self.id = str(uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
 
     def __str__(self):
         """
@@ -51,13 +53,8 @@ class BaseModel:
             Returns dictionary containing all values of __dict__
             time must be in ISO format - YYYY-MM-DD
         """
-        dict_save = {}
-        time_format = datetime.isoformat
-        for k in self.__dict__:
-            v = self.__dict__[k]
-            if k == "created_at" or k == "updated_at":
-                dict_save[k] = str(time_foramt(v))
-            else:
-                dict_save[k] = v
-        dict_save["class"] = type(self).__name__
+        dict_save = self.__dict__.copy()
+        dict_save["created_at"] = self.created_at.isoformat()
+        dict_save["updated_at"] = self.updated_at.isoformat()
+        dict_save["__class__"] = self.__class__.__name__
         return dict_save
