@@ -13,7 +13,7 @@ from models.place import Place
 from os.path import exists
 
 
-class FileStorage:
+class FileStorage():
     """
         FileStorage class
         Serializes insance to a JSON file
@@ -32,15 +32,16 @@ class FileStorage:
         """
             Returns dictionary __objects
         """
-        return FileStorage.__objects
+        return self.__objects
 
     def new(self, obj):
         """
-            sets in __objects the obj with
+            sets in __objects the  obj with
             key <obj class name>.id
         """
-        k = "{}.{}".format(type(obj).__name__, obj.id)
-        FileStorage.__objects[k] = obj
+        dictionary = obj.to_dict()
+        k = "{}.{}".format(type(obj).__name__, str(obj.id))
+        self.__objects[k] = obj
         self.save()
 
     def save(self):
@@ -48,27 +49,21 @@ class FileStorage:
             serializes __objects to the JSON file
         """
         dictionary = {}
-        for k in FileStorage.__objects.keys():
-            dictionary[k] = FileStorage.__onjects[k].to_dict()
-        with open(FileStorage.__file_path, 'w', encoding='utf-8') as f:
+        for k in self.__objects.keys():
+            dictionary[k] = self.__objects[k].to_dict()
+        with open(self.__file_path, 'w', encoding='utf-8') as f:
             f.write(json.dumps(dictionary))
 
     def reload(self):
         """
             deserializes the JSON file to __objects
         """
-        if exists(FileStorage.__file_path) is False:
+        if exists(self.__file_path) is False:
             return
         try:
             with open(FileStorage.__file_path, 'r', encoding='utf-8') as f:
-                FileStorage.__objects = {}
                 loader = json.load(f)
-                for k in loader.keys():
-                    cls = loader[k].pop("__class__", None)
-                    created = loader[k]["created_at"]
-                    created = datetime.strptime(created, "%Y-%m-%d %H:%M:%S.%f")
-                    updated = loader[k]["updated_at"]
-                    updated = datetime.strptime(updated, "%Y-%m-%d %H:%M:%S.%f")
-                    FileStorage.__objects[k] = eval(cls)(loader[k])
+                for k, v in loader.items():
+                    self.__objects[k] = BaseModel(**v)
         except Exception as e:
             pass
