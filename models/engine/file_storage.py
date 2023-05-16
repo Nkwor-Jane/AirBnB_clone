@@ -3,13 +3,6 @@
     FIleStorage module
 """
 import json
-from models.base_model import BaseModel
-from models.user import User
-from models.review import Review
-from models.state import State
-from models.city import City
-from models.amenity import Amenity
-from models.place import Place
 from os.path import exists
 
 
@@ -58,12 +51,14 @@ class FileStorage():
         """
             deserializes the JSON file to __objects
         """
+        from .given_classes import check_classes
         if exists(self.__file_path) is False:
             return
         try:
-            with open(FileStorage.__file_path, 'r', encoding='utf-8') as f:
-                loader = json.load(f)
-                for k, v in loader.items():
-                    self.__objects[k] = BaseModel(**v)
+            loader = {}
+            with open(self.__file_path, 'r', encoding='utf-8') as f:
+                loader = json.loads(f)
+                for id, dict in loader.items():
+                    self.all()[id] = check_classes[dict['__class__']](**dict)
         except Exception as e:
             pass
