@@ -5,30 +5,26 @@ Defines the BaseModel class
 
 from uuid import uuid4
 from datetime import datetime
+import models
 
 
 class BaseModel:
     """
         Defines all common attributes for other classes
     """
-    id
-    created_at
-    updated_at
 
     def __init__(self, *args, **kwargs):
         """
             Instantiates all public instance attributes
             Recreate an instance with the dictionary representation
         """
-        if kwargs is not None:
+        if len(kwargs) != 0:
             for k, v in kwargs.items():
                 if k == "created_at" or k == "updated_at":
-                    self.__dict__[k] = datetime\
-                                        .strptime(v, "%Y-%m-%dT%H:%M:%S.%f")
-#                    setattr(self, k, time)
+                    time = datetime.strptime(v, "%Y-%m-%dT%H:%M:%S.%f")
+                    setattr(self, k, time)
                 elif k == "id":
-#                    setattr(self, k, v)
-                     self.id = v
+                    setattr(self, k, v)
         else:
             self.id = str(uuid4())
             self.created_at = datetime.now()
@@ -47,6 +43,7 @@ class BaseModel:
             Updates with current datetime
         """
         self.updated_at = datetime.now()
+        models.storage.save()
 
     def to_dict(self):
         """
