@@ -4,12 +4,8 @@ footer{
 	width: 100%;
 	position:fixed;	
 	bottom:0;
-	border-top: 1px #CCCCCC
-
-}
-p{
-	position:absolute;
-        top:50%;
-	left:50%; 
-	transform:translate(-50%,-50%);
+	border-top: 1px solid #CCCCCC;
+	display:flex;
+	justify-content:center;
+	align-items:center;
 }
